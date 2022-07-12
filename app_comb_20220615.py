@@ -1,5 +1,3 @@
-#API 610 Datasheet 특화 부분 만들기
-
 import streamlit as st
 import pandas as pd
 import time
