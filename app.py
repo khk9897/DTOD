@@ -10,7 +10,6 @@ import re
 from smb.SMBConnection import SMBConnection
 import shutil
 
-
 st.set_page_config(page_title="D2D", layout="wide")
 st.sidebar.header('설정')
 mode = st.sidebar.selectbox('모드를 선택해 주세요.', ('Document to Data', 'Data to Document'), index=0)
