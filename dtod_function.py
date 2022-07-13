@@ -1,4 +1,5 @@
 import pandas as pd
+# import streamlit as st
 
 
 def ColIdxToXlName(idx):
@@ -16,8 +17,8 @@ def ColIdxToXlName(idx):
 
 
 def make_list_one(df):
+    # st.write('make_list_one')
     # excel에서 load한 한개 sheet의 df을 [row no,column no, cell value]의 column을 가지는 df으로 변환
-    start_one = time.time()
     list_from_df = df.values.tolist()
     list_rcv = []
     row_no = 0
@@ -29,14 +30,18 @@ def make_list_one(df):
             col_no += 1
         row_no += 1
     df_list = pd.DataFrame(list_rcv)
-    df_list.columns = ['row', 'col', 'value']
+    # st.write(df_list)
+    # st.write(len(df_list))
+    if len(df_list) > 0:
+        df_list.columns = ['row', 'col', 'value']
     # st.write(round(time.time() - start_one, 3), '초')
     return df_list
 
 
 def make_list_all(file_path, sheet_list):
+    # st.write('make_list_all')
     # make_list_one 함수를 반복 이용하여, 모든 sheet를 처리 하여, [sheet_name, row no,column no, cell value]의 column을 가지는 df으로 변환
-    start_all = time.time()
+    # start_all = time.time()
     df_combined = pd.DataFrame()
     df_all = pd.read_excel(file_path, sheet_name=None, header=None)
     for sheet_name in sheet_list:
@@ -53,6 +58,7 @@ def make_list_all(file_path, sheet_list):
 
 
 def make_table(df_F, df_list, df_table, file_name):
+    # st.write('make_table')
     # make_list_all을 이용해 만든 각 input file을 하나의 table로 만듬
     # [sheet_name, row no,column no, file1, file2, filex~] 의 column을 가지는 df으로 변환
     df = pd.merge(df_F, df_list, on=['sheet_name', 'row', 'col', 'value'], how="outer", indicator=True)
@@ -81,11 +87,12 @@ def make_form_list(uploaded_file):
     return form_list
 
 
-def make_final_table(uploaded_file):
+def make_final_table(uploaded_file,form_list):
     # make_table로 만든 df에 cell address, left1,left2,above 추가 하여 최종 df로 만듬
     data_table = pd.DataFrame()
     for file in uploaded_file:
-        data_list = make_list_all(file, sheet_list)
+        xl = pd.ExcelFile(file)
+        data_list = make_list_all(file, xl.sheet_names)
         data_table = make_table(form_list, data_list, data_table, file.name)
     data_table.insert(1, 'address', None)
     data_table.insert(2, 'left1!', None)
