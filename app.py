@@ -15,7 +15,7 @@ if mode == 'Document to Data':
 
     st.header('Mode : Document to Data')
     st.subheader('Step 1. 양식파일 업로드 & 시트선택')
-    form_file = st.file_uploader("양식 파일을 업로드 해주세요.", type=['xls', 'xlsx'])
+    form_file = st.file_uploader("양식 파일을 업로드 해주세요.(생략가능)", type=['xls', 'xlsx'])
 
     if form_file:
         xl = pd.ExcelFile(form_file)
@@ -40,22 +40,25 @@ if mode == 'Document to Data':
             sheet_list = form_list['sheet_name'].unique()
         st.success('- 양식 파일의 행 / 열 / 셀값을 모두 확인 하였습니다.')
 
-        data_table = make_final_table(uploaded_file,form_list, sheet_list,cell_detail)
+        data_table = make_final_table(uploaded_file, form_list, sheet_list, cell_detail)
         st.success('- 처리가 완료 되었습니다. 결과 파일을 다운로드 받으세요.')
         st.write(data_table)
         in_memory_fp = BytesIO()
         data_table.to_excel(in_memory_fp)
         st.download_button(label="Download data as xlsx", data=in_memory_fp.getvalue(),
                            file_name='summary.xlsx', mime='application/vnd.ms-excel', )
-        in_memory_fp1 = BytesIO()
-        form_list.to_excel(in_memory_fp1)
-        st.download_button(label="Download form_list as xlsx", data=in_memory_fp1.getvalue(),
-                           file_name='form_list.xlsx', mime='application/vnd.ms-excel', )
+
+        ## form_list를 엑셀로 받는 기능
+        # in_memory_fp1 = BytesIO()
+        # form_list.to_excel(in_memory_fp1)
+        # st.download_button(label="Download form_list as xlsx", data=in_memory_fp1.getvalue(),
+        #                    file_name='form_list.xlsx', mime='application/vnd.ms-excel', )
+
 if mode == 'Data to Document':
 
     st.header('Mode : Data to Document')
     st.subheader('Step 1. 양식파일 업로드')
-    form_file = st.file_uploader("양식 파일을 업로드 해주세요.", type=['xls', 'xlsx'])
+    form_file = st.file_uploader("양식 파일을 업로드 해주세요.", type=['xlsx'])
     st.subheader('Step 2. 데이터 파일 업로드')
     data_file = st.file_uploader("데이터 파일을 업로드 해주세요.", type=['xls', 'xlsx'])
     start = st.button("실행")
