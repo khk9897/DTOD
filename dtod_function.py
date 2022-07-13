@@ -1,12 +1,8 @@
 import pandas as pd
 
 
-# import streamlit as st
-
-
+# excel의 columns no(1,2,3)을 letter(A,B,C)로 변환하는 함수 from stackoverflow
 def ColIdxToXlName(idx):
-    # excel의 columns no(1,2,3)을 letter(A,B,C)로 변환하는 함수 from stackoverflow
-
     if idx < 1:
         raise ValueError("Index is too small")
     result = ""
@@ -18,8 +14,9 @@ def ColIdxToXlName(idx):
             return chr(idx + ord('A') - 1) + result
 
 
+# excel에서 load한 한개 sheet의 df을 받아,
+# [row no,column no, cell value]의 column을 가지는 df로 변환하여 반환
 def make_list_one(df):
-    # excel에서 load한 한개 sheet의 df을 [row no,column no, cell value]의 column을 가지는 df으로 변환
     list_from_df = df.values.tolist()
     list_rcv = []
     row_no = 0
@@ -36,8 +33,9 @@ def make_list_one(df):
     return df_list
 
 
+# make_list_one 함수를 반복 이용하여, 모든 sheet를 처리 하여,
+# [sheet_name, row no,column no, cell value]의 column을 가지는 df으로 변환
 def make_list_all(file_path, sheet_list):
-    # make_list_one 함수를 반복 이용하여, 모든 sheet를 처리 하여, [sheet_name, row no,column no, cell value]의 column을 가지는 df으로 변환
     df_combined = pd.DataFrame()
     df_all = pd.read_excel(file_path, sheet_name=None, header=None)
     for sheet_name in sheet_list:
@@ -45,18 +43,15 @@ def make_list_all(file_path, sheet_list):
         df_list = make_list_one(df)
         df_list['sheet_name'] = sheet_name
         df_combined = df_combined.append(df_list)
-        # print(sheet_name)
 
     df_combined = df_combined[['sheet_name', 'row', 'col', 'value']]
     df_combined = df_combined.reset_index(drop=True)
-    # st.write(round(time.time() - start_all, 2), '초')
     return df_combined
 
 
+# make_list_all을 이용해 만든 각 input files들의 결과를 하나의 table로 만듬
+# [sheet_name, row no,column no, file1, file2, filex~] 의 column을 가지는 df으로 변환
 def make_table(df_f, df_list, df_table, file_name):
-    # st.write('make_table')
-    # make_list_all을 이용해 만든 각 input file을 하나의 table로 만듬
-    # [sheet_name, row no,column no, file1, file2, filex~] 의 column을 가지는 df으로 변환
     df = pd.merge(df_f, df_list, on=['sheet_name', 'row', 'col', 'value'], how="outer", indicator=True)
     df = df[df._merge == 'right_only']
     df = df.drop(['_merge'], axis=1)
@@ -68,8 +63,8 @@ def make_table(df_f, df_list, df_table, file_name):
     return df_table
 
 
+# 양식 파일이 없을 경우, 각 파일들을 비교하며, 반복되는 부분을 양식이라 간주 함
 def make_form_list(uploaded_file):
-    # 양식 파일이 없을 경우, 데이터시트 파일들을 비교하며, 반복되는 부분을 양식이라 간주 함
     form_list = pd.DataFrame()
     count = 0
     for file in uploaded_file:
@@ -83,8 +78,8 @@ def make_form_list(uploaded_file):
     return form_list
 
 
-def make_final_table(uploaded_file, form_list, sheet_list,cell_detail):
-    # make_table로 만든 df에 cell address, left1,left2,above 추가 하여 최종 df로 만듬
+# make_table로 만든 df에 cell address, left1,left2,above 추가 하여 최종 df로 만듬
+def make_final_table(uploaded_file, form_list, sheet_list, cell_detail):
     data_table = pd.DataFrame()
     for file in uploaded_file:
         data_list = make_list_all(file, sheet_list)
@@ -118,5 +113,5 @@ def make_final_table(uploaded_file, form_list, sheet_list,cell_detail):
     data_table.rename(columns={'row': 'row!'}, inplace=True)
     data_table.rename(columns={'col': 'col!'}, inplace=True)
     if not cell_detail:
-        data_table.drop(['row!','col!'], axis=1, inplace=True)
+        data_table.drop(['row!', 'col!'], axis=1, inplace=True)
     return data_table
