@@ -26,6 +26,7 @@ if mode == 'Document to Data':
     st.subheader('Step 2. 데이터시트 업로드')
     uploaded_file = st.file_uploader("엑셀 파일을 업로드 해주세요.", type=['xls', 'xlsx'], accept_multiple_files=True)
 
+    cell_detail = st.checkbox("Cell detail 표시")
     start = st.button('실행')
 
     if start:
