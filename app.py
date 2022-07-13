@@ -41,7 +41,7 @@ if mode == 'Document to Data':
             sheet_list = form_list['sheet_name'].unique()
         st.success('- 양식 파일의 행 / 열 / 셀값을 모두 확인 하였습니다.')
 
-        data_table = make_final_table(uploaded_file,form_list)
+        data_table = make_final_table(uploaded_file,form_list, sheet_list)
         st.success('- 처리가 완료 되었습니다. 결과 파일을 다운로드 받으세요.')
         st.write(data_table)
         in_memory_fp = BytesIO()

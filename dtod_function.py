@@ -87,13 +87,13 @@ def make_form_list(uploaded_file):
     return form_list
 
 
-def make_final_table(uploaded_file,form_list):
+def make_final_table(uploaded_file,form_list, sheet_list):
     # make_table로 만든 df에 cell address, left1,left2,above 추가 하여 최종 df로 만듬
     data_table = pd.DataFrame()
     for file in uploaded_file:
-        xl = pd.ExcelFile(file)
-        data_list = make_list_all(file, xl.sheet_names)
+        data_list = make_list_all(file, sheet_list)
         data_table = make_table(form_list, data_list, data_table, file.name)
+
     data_table.insert(1, 'address', None)
     data_table.insert(2, 'left1!', None)
     data_table.insert(3, 'left2!', None)
