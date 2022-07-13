@@ -83,7 +83,7 @@ def make_form_list(uploaded_file):
     return form_list
 
 
-def make_final_table(uploaded_file, form_list, sheet_list):
+def make_final_table(uploaded_file, form_list, sheet_list,cell_detail):
     # make_table로 만든 df에 cell address, left1,left2,above 추가 하여 최종 df로 만듬
     data_table = pd.DataFrame()
     for file in uploaded_file:
@@ -92,8 +92,9 @@ def make_final_table(uploaded_file, form_list, sheet_list):
 
     data_table.insert(1, 'address', None)
     data_table.insert(2, 'left1!', None)
-    data_table.insert(3, 'left2!', None)
-    data_table.insert(4, 'above!', None)
+    if cell_detail:
+        data_table.insert(3, 'left2!', None)
+        data_table.insert(4, 'above!', None)
 
     for i in data_table.index:
         row = data_table.loc[i, 'row']
@@ -106,8 +107,9 @@ def make_final_table(uploaded_file, form_list, sheet_list):
         above = list(form_list['value'][
                          (form_list.row < row) & (form_list.col == col) & (form_list.sheet_name == sheet)])
         if len(left) > 0: data_table.loc[i, 'left1!'] = left[-1]
-        if len(left) > 1: data_table.loc[i, 'left2!'] = left[-2]
-        if len(above) > 0: data_table.loc[i, 'above!'] = above[-1]
+        if cell_detail:
+            if len(left) > 1: data_table.loc[i, 'left2!'] = left[-2]
+            if len(above) > 0: data_table.loc[i, 'above!'] = above[-1]
         # above로 표시 할 단어들을 제한하기 위한, 조건문 (ex. Rated / Normal / Min. 등등)
         # if above[-1].upper() in above_limit.upper():
         #     data_table.loc[i, 'above'] = above[-1]
@@ -115,4 +117,6 @@ def make_final_table(uploaded_file, form_list, sheet_list):
     data_table.index.name = 'No!'
     data_table.rename(columns={'row': 'row!'}, inplace=True)
     data_table.rename(columns={'col': 'col!'}, inplace=True)
+    if not cell_detail:
+        data_table.drop(['row!','col!'], axis=1, inplace=True)
     return data_table
