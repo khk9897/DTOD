@@ -5,6 +5,7 @@ import openpyxl
 import os
 import datetime
 import re
+import shutil
 import webbrowser
 
 st.set_page_config(page_title="D2D", layout="wide")
@@ -63,7 +64,7 @@ if mode == 'Data to Document':
     form_file = st.file_uploader("양식 파일을 업로드 해주세요.", type=['xlsx'])
     st.subheader('Step 2. 데이터 파일 업로드')
     data_file = st.file_uploader("데이터 파일을 업로드 해주세요.", type=['xls', 'xlsx'])
-    pw_required = st.checkbox("결과물 ZIP 파일에 암호를 보호 하고 싶으면 여기를 클릭하세요.")
+    pw_required = st.checkbox("결과ZIP 파일을 암호를 보호")
     if pw_required:
         password = st.text_input("ZIP 파일에 사용 할 비밀번호를 입력 하세요.", type="password")
     start = st.button("실행")
@@ -121,5 +122,16 @@ if mode == 'Data to Document':
                 prog.progress(c / len(header_list))
                 txt1.text(str(len(header_list)) + '/' + str(len(header_list)) + '(100%)')
 
+            os.chdir('output\\'+folder_name +'\\')
+            file_name = folder_name+'.zip'
+            if pw_required and len(password) > 1:
+                os.system('zip ' + file_name + ' * -P ' + password)
+            else:
+                os.system('zip ' + file_name + ' *')
+            os.replace(file_name, '../'+file_name)
+            os.chdir('..')
+            shutil.rmtree(folder_name)
+            os.chdir('..')
+
             st.success('처리가 완료 되었습니다. 다운로드 창이 열립니다.')
-            webbrowser.open_new_tab(url2+folder_name+'.zip')
+            webbrowser.open_new_tab(url2+file_name)
