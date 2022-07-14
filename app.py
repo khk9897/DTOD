@@ -11,7 +11,7 @@ st.set_page_config(page_title="D2D", layout="wide")
 st.sidebar.header('설정')
 url1 = 'http://10.51.160.87:18555/'
 url2 = 'http://localhost:8080/'
-mode = st.sidebar.selectbox('모드를 선택해 주세요.', ('Document to Data', 'Data to Document'), index=0)
+mode = st.sidebar.radio('모드를 선택해 주세요.', ('Document to Data', 'Data to Document'), index=0)
 
 if mode == 'Document to Data':
 
