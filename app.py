@@ -5,10 +5,12 @@ import openpyxl
 import os
 import datetime
 import re
-from smb.SMBConnection import SMBConnection
+import webbrowser
 
 st.set_page_config(page_title="D2D", layout="wide")
 st.sidebar.header('설정')
+url1 = 'http://10.51.160.87:18555/'
+url2 = 'http://localhost:8080/'
 mode = st.sidebar.selectbox('모드를 선택해 주세요.', ('Document to Data', 'Data to Document'), index=0)
 
 if mode == 'Document to Data':
@@ -61,6 +63,9 @@ if mode == 'Data to Document':
     form_file = st.file_uploader("양식 파일을 업로드 해주세요.", type=['xlsx'])
     st.subheader('Step 2. 데이터 파일 업로드')
     data_file = st.file_uploader("데이터 파일을 업로드 해주세요.", type=['xls', 'xlsx'])
+    pw_required = st.checkbox("결과물 ZIP 파일에 암호를 보호 하고 싶으면 여기를 클릭하세요.")
+    if pw_required:
+        password = st.text_input("ZIP 파일에 사용 할 비밀번호를 입력 하세요.", type="password")
     start = st.button("실행")
 
     # 필요한 파일이 없을 경우 Warning
@@ -71,8 +76,8 @@ if mode == 'Data to Document':
     if start & (form_file is not None) & (data_file is not None):
 
         now = datetime.datetime.now()
-        folder_name = '[999_temp]\\' + now.strftime("%Y%m%d_%H%M%S")
-        os.mkdir(folder_name)
+        folder_name = now.strftime("%Y%m%d_%H%M%S")
+        os.mkdir('output\\'+folder_name)
 
         df = pd.read_excel(data_file, index_col=None, header=0)
         header_list = list(df.columns)
@@ -87,12 +92,6 @@ if mode == 'Data to Document':
             header_list.remove('address')
             st.write(str(len(header_list)) + '개의 문서를 작성하겠습니다.')
 
-            # 공유 폴더 업로드를 위한 부분
-            conn = SMBConnection(userID, password, client_machine_name, server_name, domain=domain_name,
-                                 use_ntlm_v2=True,
-                                 is_direct_tcp=True)
-            connected = conn.connect(server_ip, 445)
-            conn.createDirectory(service, folder_name, timeout=30)
             c = 0
             txt1 = st.text('')
             prog = st.progress(0)
@@ -115,16 +114,12 @@ if mode == 'Data to Document':
                         b = df_2.loc[i, header]
                         sheet[a].value = b
                 fn = re.sub('[\/:*?"<>|]', '', header)  # 파일이름에 사용 할 수 없는 특수문자를 정규식을 이용해 삭제함.
-                wb.save(folder_name + fn + '.xlsx')
+                wb.save('output\\'+folder_name +'\\' +fn + '.xlsx')
                 wb.close()
+
                 c += 1
                 prog.progress(c / len(header_list))
                 txt1.text(str(len(header_list)) + '/' + str(len(header_list)) + '(100%)')
 
-                # 공유 폴더 업로드를 위한 부분
-                with open(folder_name + header + '.xlsx', 'rb') as file_obj:
-                    conn.storeFile(service, folder_name + r'\\' + header + '.xlsx', file_obj)
-
-            st.success('처리가 완료 되었습니다. 다음 공유폴더에서 결과물을 확인 하세요.')
-            st.success(r'\\\\' + server_ip + r'\\' + service + r'\\' + folder_name)
-            # shutil.rmtree(folder_name) #공유폴더에 Upload 후 서버에서 결과 파일을 삭제 하기 위함.
+            st.success('처리가 완료 되었습니다. 다운로드 창이 열립니다.')
+            webbrowser.open_new_tab(url2+folder_name+'.zip')
