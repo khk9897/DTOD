@@ -9,12 +9,17 @@ import datetime
 import re
 import shutil
 import webbrowser
+from PIL import Image
+image1 = Image.open('mode1.jpg')
+image2 = Image.open('mode2.jpg')
 
 st.set_page_config(page_title="D2D", layout="wide")
 st.sidebar.subheader('모드 선택')
 url1 = 'http://10.51.160.87:18555/'
 url2 = 'http://localhost:8080/'
 mode = st.sidebar.radio('모드를 선택해 주세요.', ('Document to Summary', 'Summary to Document'), index=0)
+if mode == 'Document to Summary': st.sidebar.image(image1)
+else: st.sidebar.image(image2)
 st.sidebar.markdown('***')
 st.sidebar.write('개발자:')
 st.sidebar.write('강호경책임')
@@ -25,7 +30,7 @@ if st.sidebar.button('개발자 연결'):
 
 if mode == 'Document to Summary':
 
-    st.header('Mode : Document to Data')
+    st.header('Mode : Document to Summary')
     st.subheader('Step 1. 양식파일 업로드 & 시트선택')
     form_file = st.file_uploader("양식 파일을 업로드 해주세요.(생략가능)", type=['xls', 'xlsx'])
 
@@ -60,6 +65,15 @@ if mode == 'Document to Summary':
         st.download_button(label="Download data as xlsx", data=in_memory_fp.getvalue(),
                            file_name='summary.xlsx', mime='application/vnd.ms-excel', )
 
+    f = open("mode1_note.txt", 'r')
+    line = f.readline()
+    st.subheader(line)
+    while True:
+        line = f.readline()
+        if not line: break
+        st.write(line)
+    f.close()
+
         ## form_list를 엑셀로 받는 기능
         # in_memory_fp1 = BytesIO()
         # form_list.to_excel(in_memory_fp1)
@@ -68,10 +82,10 @@ if mode == 'Document to Summary':
 
 if mode == 'Summary to Document':
 
-    st.header('Mode : Data to Document')
+    st.header('Mode : Summary to Document')
     st.subheader('Step 1. 양식파일 업로드')
     form_file = st.file_uploader("양식 파일을 업로드 해주세요.", type=['xlsx'])
-    st.subheader('Step 2. 데이터 파일 업로드')
+    st.subheader('Step 2. Summary 파일 업로드')
     data_file = st.file_uploader("데이터 파일을 업로드 해주세요.", type=['xls', 'xlsx'])
     pw_required = st.checkbox("결과ZIP 파일을 암호를 보호")
     if pw_required:
@@ -144,3 +158,12 @@ if mode == 'Summary to Document':
 
             st.success('처리가 완료 되었습니다. 다운로드 창이 열립니다.')
             webbrowser.open_new_tab(url2+'/output/'+file_name)
+
+    f = open("mode2_note.txt", 'r')
+    line = f.readline()
+    st.subheader(line)
+    while True:
+        line = f.readline()
+        if not line: break
+        st.write(line)
+    f.close()
