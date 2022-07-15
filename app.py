@@ -10,6 +10,7 @@ import re
 import shutil
 import webbrowser
 from PIL import Image
+
 image1 = Image.open('mode1.jpg')
 image2 = Image.open('mode2.jpg')
 
