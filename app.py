@@ -1,3 +1,5 @@
+# 본 app 실행전, 파일서버 운영을 위해 python -m http.server 8080를 실행하여야 함.
+
 import streamlit as st
 from dtod_function import *
 from io import BytesIO
@@ -9,12 +11,19 @@ import shutil
 import webbrowser
 
 st.set_page_config(page_title="D2D", layout="wide")
-st.sidebar.header('설정')
+st.sidebar.subheader('모드 선택')
 url1 = 'http://10.51.160.87:18555/'
 url2 = 'http://localhost:8080/'
-mode = st.sidebar.radio('모드를 선택해 주세요.', ('Document to Data', 'Data to Document'), index=0)
+mode = st.sidebar.radio('모드를 선택해 주세요.', ('Document to Summary', 'Summary to Document'), index=0)
+st.sidebar.markdown('***')
+st.sidebar.write('개발자:')
+st.sidebar.write('강호경책임')
+st.sidebar.write('kanghk1@gsenc.com')
 
-if mode == 'Document to Data':
+if st.sidebar.button('개발자 연결'):
+    webbrowser.open_new_tab('teams.microsoft.com/l/chat/0/0?users=kanghk1@gsenc.com')
+
+if mode == 'Document to Summary':
 
     st.header('Mode : Document to Data')
     st.subheader('Step 1. 양식파일 업로드 & 시트선택')
@@ -57,7 +66,7 @@ if mode == 'Document to Data':
         # st.download_button(label="Download form_list as xlsx", data=in_memory_fp1.getvalue(),
         #                    file_name='form_list.xlsx', mime='application/vnd.ms-excel', )
 
-if mode == 'Data to Document':
+if mode == 'Summary to Document':
 
     st.header('Mode : Data to Document')
     st.subheader('Step 1. 양식파일 업로드')
@@ -134,4 +143,4 @@ if mode == 'Data to Document':
             os.chdir('..')
 
             st.success('처리가 완료 되었습니다. 다운로드 창이 열립니다.')
-            webbrowser.open_new_tab(url2+file_name)
+            webbrowser.open_new_tab(url2+'/output/'+file_name)
