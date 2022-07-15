@@ -1,4 +1,5 @@
 import pandas as pd
+import streamlit as st
 
 
 # excel의 columns no(1,2,3)을 letter(A,B,C)로 변환하는 함수 from stackoverflow
@@ -115,3 +116,16 @@ def make_final_table(uploaded_file, form_list, sheet_list, cell_detail):
     if not cell_detail:
         data_table.drop(['row!', 'col!'], axis=1, inplace=True)
     return data_table
+
+
+# txt파일의 내용을 화면 표시하기 위한 기능 mode 0: 본문 / mode 1:Side 에 노트 표시
+def show_note(file_name,mode):
+    if mode == 0: st.markdown('***')
+    if mode == 1: st.sidebar.markdown('***')
+    f = open(file_name, 'r')
+    while True:
+        line = f.readline()
+        if not line: break
+        if mode == 0: st.markdown(line)
+        if mode == 1: st.sidebar.markdown(line)
+    f.close()
